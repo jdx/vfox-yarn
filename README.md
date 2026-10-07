@@ -3,11 +3,12 @@
 Yarn plugin for [mise](https://mise.jdx.dev/) (using the vfox plugin format).
 
 > 💡 **Note:** This plugin validates package authenticity via [`gpg`](https://www.openpgp.org/) only for yarn v1.
-> v2 and later versions are downloaded as single js file which doesn't have any signatures
+> v2–v5 are downloaded as a single js file which doesn't have any signatures. Yarn 6+ is installed from
+> the platform's `@yarnpkg/yarn-<target>` npm package, whose sha1 is checked against the npm registry metadata.
 
 ## Features
 
-- Supports Yarn Classic (v1.x) and Yarn Berry (v2.x+)
+- Supports Yarn Classic (v1.x), Yarn Berry (v2.x–v5.x), and Yarn 6+ (the Rust rewrite)
 - Cross-platform: Works on Linux, macOS, and Windows
 - GPG signature verification for v1 releases (optional)
 - Lists v1 versions first for easier selection
@@ -40,6 +41,10 @@ mise install yarn@1.22.22
 
 # Install latest v2
 mise install yarn@2
+
+# Install a Yarn 6 release candidate (Linux and Apple Silicon macOS only;
+# prereleases are hidden from `ls-remote` and `latest`)
+mise install yarn@6.0.0-rc.22
 
 # Install latest version
 mise install yarn@latest
