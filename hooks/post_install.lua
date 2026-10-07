@@ -27,9 +27,20 @@ function PLUGIN:PostInstall(ctx)
         return {}
     end
 
-    local major_version = string.sub(version, 1, 1)
+    local major_version = tonumber(version:match("^(%d+)")) or 0
 
-    if major_version ~= "1" then
+    if major_version >= 6 then
+        -- Yarn ZPM (v6+) - mise extracted the platform package (a single
+        -- native binary); move it to bin/ where EnvKeys expects it
+        local bin_dir = file.join_path(install_path, "bin")
+        os.execute('mkdir -p "' .. bin_dir .. '"')
+        local binary = file.join_path(install_path, "yarn")
+        if not file.exists(binary) then
+            error("Yarn " .. version .. " package did not contain a yarn binary at " .. binary)
+        end
+        os.execute('mv "' .. binary .. '" "' .. file.join_path(bin_dir, "yarn") .. '"')
+        os.execute('chmod +x "' .. file.join_path(bin_dir, "yarn") .. '"')
+    elseif major_version >= 2 then
         -- Yarn Berry (v2.x+) - download single JS file
         local yarn_url = "https://repo.yarnpkg.com/" .. version .. "/packages/yarnpkg-cli/bin/yarn.js"
 

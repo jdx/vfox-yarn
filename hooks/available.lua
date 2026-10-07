@@ -1,5 +1,8 @@
 --- List all available versions
 
+local http = require("http")
+local json = require("json")
+
 local function fetch_github_tags(repo_url)
     -- Use git ls-remote to get tags
     local cmd = 'git ls-remote --refs --tags "' .. repo_url .. '"'
@@ -65,6 +68,24 @@ end
 
 function PLUGIN:Available(ctx)
     local versions = {}
+
+    -- Get Yarn ZPM versions (v6+). Only versions published to npm are
+    -- installable (some git tags never were), so list the npm package. Every
+    -- platform package carries the same versions, so any one will do.
+    local resp, err = http.get({ url = "https://registry.npmjs.org/@yarnpkg/yarn-x86_64-unknown-linux-musl" })
+    if err == nil and resp.status_code == 200 then
+        local zpm_versions = {}
+        for version in pairs(json.decode(resp.body).versions or {}) do
+            local major = tonumber(version:match("^(%d+)%.%d+%.%d+"))
+            if major and major >= 6 then
+                table.insert(zpm_versions, version)
+            end
+        end
+        table.sort(zpm_versions, version_compare)
+        for _, version in ipairs(zpm_versions) do
+            table.insert(versions, { version = version })
+        end
+    end
 
     -- Get Yarn Berry versions (v2.x+)
     local berry_tags = fetch_github_tags("https://github.com/yarnpkg/berry.git")

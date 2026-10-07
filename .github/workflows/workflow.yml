@@ -80,6 +80,17 @@ jobs:
           mise i yarn@2
           mise x yarn@2 -- yarn --version | grep -E '^2\.'
       
+      # Test Yarn 6+ (ZPM). Only RCs are published so far, so pin one. There
+      # are no Windows or Intel macOS binaries, so skip those runners.
+      - name: Test Yarn 6 installation
+        if: runner.os == 'Linux' || (runner.os == 'macOS' && runner.arch == 'ARM64')
+        shell: bash
+        run: |
+          mise i yarn@6.0.0-rc.22
+          mise x yarn@6.0.0-rc.22 -- yarn --version | grep -E '^6\.0\.0-rc\.22$'
+          # Prereleases must not be picked as latest
+          mise latest yarn | grep -Ev '^6\.'
+
       # Test latest Yarn
       - name: Test latest Yarn
         shell: bash
