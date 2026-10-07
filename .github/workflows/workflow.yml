@@ -89,7 +89,8 @@ jobs:
           mise i yarn@6.0.0-rc.22
           mise x yarn@6.0.0-rc.22 -- yarn --version | grep -E '^6\.0\.0-rc\.22$'
           # Prereleases must not be picked as latest
-          mise latest yarn | grep -Ev '^6\.'
+          latest=$(mise latest yarn)
+          case "$latest" in *-*) echo "latest is a prerelease: $latest"; exit 1 ;; esac
 
       # Test latest Yarn
       - name: Test latest Yarn

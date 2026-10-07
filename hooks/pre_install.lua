@@ -8,7 +8,7 @@ local json = require("json")
 local ZPM_TARGETS = {
     ["darwin/arm64"] = "aarch64-apple-darwin",
     ["linux/arm64"] = "aarch64-unknown-linux-musl",
-    ["linux/386"] = "i686-unknown-linux-musl",
+    ["linux/x86"] = "i686-unknown-linux-musl",
     ["linux/amd64"] = "x86_64-unknown-linux-musl",
 }
 
@@ -60,7 +60,8 @@ function PLUGIN:PreInstall(ctx)
         -- post-install moves the binary into bin/
         local target = zpm_target()
         local url = "https://registry.npmjs.org/@yarnpkg/yarn-" .. target .. "/" .. version
-        local resp, err = http.get({ url = url })
+        -- try_get reports transport failures as a return value; http.get raises
+        local resp, err = http.try_get({ url = url })
         if err ~= nil or resp.status_code ~= 200 then
             error("Failed to look up Yarn " .. version .. " at " .. url .. ": " .. tostring(err or resp.status_code))
         end

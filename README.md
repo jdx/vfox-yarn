@@ -3,7 +3,8 @@
 Yarn plugin for [mise](https://mise.jdx.dev/) (using the vfox plugin format).
 
 > 💡 **Note:** This plugin validates package authenticity via [`gpg`](https://www.openpgp.org/) only for yarn v1.
-> v2 and later versions are downloaded as single js file which doesn't have any signatures
+> v2–v5 are downloaded as a single js file which doesn't have any signatures. Yarn 6+ is installed from
+> the platform's `@yarnpkg/yarn-<target>` npm package, whose sha1 is checked against the npm registry metadata.
 
 ## Features
 

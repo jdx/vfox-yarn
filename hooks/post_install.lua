@@ -38,8 +38,17 @@ function PLUGIN:PostInstall(ctx)
         if not file.exists(binary) then
             error("Yarn " .. version .. " package did not contain a yarn binary at " .. binary)
         end
-        os.execute('mv "' .. binary .. '" "' .. file.join_path(bin_dir, "yarn") .. '"')
-        os.execute('chmod +x "' .. file.join_path(bin_dir, "yarn") .. '"')
+        local target = file.join_path(bin_dir, "yarn")
+        -- os.execute returns true (5.2+) or 0 (5.1) on success
+        local function ok(r)
+            return r == true or r == 0
+        end
+        if not ok(os.execute('mv "' .. binary .. '" "' .. target .. '"')) then
+            error("Failed to move " .. binary .. " to " .. target)
+        end
+        if not ok(os.execute('chmod +x "' .. target .. '"')) then
+            error("Failed to make " .. target .. " executable")
+        end
     elseif major_version >= 2 then
         -- Yarn Berry (v2.x+) - download single JS file
         local yarn_url = "https://repo.yarnpkg.com/" .. version .. "/packages/yarnpkg-cli/bin/yarn.js"
